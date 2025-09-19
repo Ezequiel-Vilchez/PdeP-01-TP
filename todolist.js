@@ -55,7 +55,7 @@ async function main() {
         console.clear();
         break;
 
-      case 2:
+case 2:
         console.clear();
 
         if (tareas.length === 0) {
@@ -67,9 +67,17 @@ async function main() {
           console.log("Buscar una Tarea 🔍\n");
 
           const busqueda = await input("Ingrese el término de búsqueda: ");
-          const resultados = Object.entries(tareas).filter(([id, tarea]) =>
+          if(busqueda!==""){
+            const resultados = Object.entries(tareas).filter(([id, tarea]) =>
             tarea.toLowerCase().includes(busqueda.toLowerCase())
           );
+          }else{
+            console.log("\nNo se puede ingresar espacios vacios.");
+            await input("\nPresiona ENTER para continuar...");
+            console.clear();
+            break;
+          }
+          
 
           if (resultados.length > 0) {
             console.log("\nResultados de la búsqueda:\n");
@@ -83,7 +91,7 @@ async function main() {
         await input("\nPresiona ENTER para continuar...");
         console.clear();
         break;
-
+        
       case 3:
 
         console.clear();
