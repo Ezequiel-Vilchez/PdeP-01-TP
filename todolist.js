@@ -135,7 +135,11 @@ async function main() {
         break;
 
       default:
+        console.clear();
         console.log("Opción inválida. Por favor, ingrese una opción del menú.");
+        await input("\nPresiona ENTER para continuar...");
+        console.clear();
+        break;
     }
 
   } while (opcion !== 0);
