@@ -5,7 +5,44 @@
 const { input, close } = require("./lib/nodeImperativo");
 
 // Lista de tareas en memoria
-let tareas = [];
+
+// [titulo principal, descipcion, 'terminado, en curso, pendiente y canceladas', 'facil, medio y dificil', vencimiento, creacion]
+
+
+let tareas = [
+    {
+        titulo: "Java",
+        descripcion: "Aprender Java desde cero",
+        estado: "cancelada",
+        prioridad: 2,
+        fechaLimite: "2024-12-31",
+        fechaInicio: "2024-06-01"
+    },
+    {
+        titulo: "JavaScript",
+        descripcion: "Dominar JavaScript y sus frameworks",
+        estado: "en progreso",
+        prioridad: 3,
+        fechaLimite: "2024-11-30",
+        fechaInicio: "2024-06-05"
+    },
+    {
+        titulo: "Python",
+        descripcion: "Aprender Python para análisis de datos",
+        estado: "completada",
+        prioridad: 1,
+        fechaLimite: "2024-10-15",
+        fechaInicio: "2024-05-20"
+    },
+    {
+        titulo: "HTML",
+        descripcion: "Aprender HTML y CSS",
+        estado: "pendiente",
+        prioridad: 2,
+        fechaLimite: "2024-12-31",
+        fechaInicio: "2024-06-01"
+    }
+];
 
 // Función para mostrar el menú
 function mostrarMenu() {
@@ -46,7 +83,7 @@ async function main() {
         } else {
           console.log(`${nombre}, tus tareas son las siguientes: 👀\n`);
           for (const tarea of Object.values(tareas)) {
-            console.log(`- ${tarea}`);
+            console.log(`- ${tarea.titulo}`);
           }
 
         }
@@ -59,35 +96,29 @@ case 2:
         console.clear();
 
         if (tareas.length === 0) {
-          console.log("Tu lista de tareas está vacía. No hay nada que buscar. 🧐");
+          console.log("Tu lista de tareas está vacía. No hay nada que buscar. 🔍");
           await input("\nPresiona ENTER para continuar...");
           console.clear();
           break;
-        } else {
-          console.log("Buscar una Tarea 🔍\n");
-
-          const busqueda = await input("Ingrese el término de búsqueda: ");
-          if(busqueda!==""){
-            const resultados = Object.entries(tareas).filter(([id, tarea]) =>
-            tarea.toLowerCase().includes(busqueda.toLowerCase())
-          );
-          }else{
-            console.log("\nNo se puede ingresar espacios vacios.");
-            await input("\nPresiona ENTER para continuar...");
-            console.clear();
-            break;
-          }
-          
-
-          if (resultados.length > 0) {
-            console.log("\nResultados de la búsqueda:\n");
-            resultados.forEach(([id, tarea]) => {
-              console.log(`- ${tarea}`);
-            });
-          } else {
-            console.log("\nNo se encontraron tareas que coincidan con la búsqueda.");
-          }
         }
+
+        const terminoBusqueda = await input(`Por favor ${nombre}, ingresa el término de búsqueda:\n\n> `);
+        
+        const resultados = tareas.filter(tarea =>
+          tarea.titulo.toLowerCase().includes(terminoBusqueda.toLowerCase())
+        );
+
+        if (resultados.length > 0) {
+          console.log("\nResultados de la búsqueda:\n");
+
+          resultados.forEach(tarea => {
+            console.log(`- ${tarea.titulo}`);
+          });
+
+        } else {
+          console.log("\nNo se encontraron tareas que coincidan con la búsqueda.");
+        }
+
         await input("\nPresiona ENTER para continuar...");
         console.clear();
         break;
@@ -96,18 +127,79 @@ case 2:
 
         console.clear();
         console.log("Agregar una Tarea ➕\n");
-        const nuevaTarea = await input(`Por favor ${nombre}, ingrese la descripción de la nueva tarea\n\n> `);
 
-        if (nuevaTarea.trim() === "") {
-          console.log("\nLa descripción de la tarea no puede estar vacía.");
-        } else {
-          tareas.push(nuevaTarea);
-          console.log(`\nTarea agregada con éxito.`);
+      let titulo = "";
+      do {
+        titulo = await input(`Por favor ${nombre}, ingrese el título de la nueva tarea\n\n> `);
+
+        if (titulo.trim() === "") {
+          console.log("\nEl título de la tarea no puede estar vacío.");
+
+          await input("\nPresiona ENTER para intentar de nuevo...");
+          console.clear();
         }
+      } while (titulo.trim() === "");
 
-        await input("\nPresiona ENTER para continuar...");
-        console.clear();
-        break;
+      console.clear();
+
+      do {
+        descripcion = await input(`Por favor ${nombre}, ingrese la descripción de la nueva tarea\n\n> `);
+
+        if (descripcion.trim() === "") {
+          console.log("\nLa descripción de la tarea no puede estar vacía.");
+
+          await input("\nPresiona ENTER para intentar de nuevo...");
+          console.clear();
+        }
+      } while (descripcion.trim() === "");
+
+      console.clear();
+
+      do {
+        estado = await input(`Por favor ${nombre}, ingrese el estado de la nueva tarea (pendiente, en progreso, completada, cancelada)\n\n> `);
+
+        if (["pendiente", "en progreso", "completada", "cancelada"].includes(estado.trim())) {
+          break;
+        } else {
+          console.log("\nEstado inválido. Por favor, ingrese un estado válido.");
+          await input("\nPresiona ENTER para intentar de nuevo...");
+          console.clear();
+        }
+      } while (estado.trim() === "" || !["pendiente", "en progreso", "completada", "cancelada"].includes(estado.trim()));
+
+      console.clear();
+
+      do {
+        prioridad = await input(`Por favor ${nombre}, ingrese la prioridad de la nueva tarea (1-3)\n\n> `);
+
+        if (["1", "2", "3"].includes(prioridad.trim())) {
+          console.clear();
+          break;
+        } else {
+          console.log("\nPrioridad inválida. Por favor, ingrese una prioridad válida (1, 2 o 3).");
+          await input("\nPresiona ENTER para intentar de nuevo...");
+          console.clear();
+        }
+      } while (prioridad.trim() === "" || !["1", "2", "3"].includes(prioridad.trim()));
+
+      console.clear();
+
+      const fechaLimite = await input(`Por favor ${nombre}, ingrese la fecha límite de la nueva tarea (YYYY-MM-DD)\n\n> `);
+      const fechaInicio = new Date().toISOString().split('T')[0]; // Fecha actual en formato YYYY-MM-DD
+
+      tareas.push({
+        titulo,
+        descripcion,
+        estado,
+        prioridad: parseInt(prioridad, 10),
+        fechaLimite,
+        fechaInicio
+      });
+      console.log(`\nTarea agregada con éxito.`);
+
+      await input("\nPresiona ENTER para continuar...");
+      console.clear();
+      break;
 
       case 4:
         console.clear();
