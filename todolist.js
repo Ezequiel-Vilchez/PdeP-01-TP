@@ -213,7 +213,7 @@ case 2:
 
           console.log("Eliminar una Tarea ❌\n");
           tareas.forEach((tarea, index) => {
-            console.log(`[${index}] ${tarea}`);
+            console.log(`[${index}] ${tarea.titulo}`);
           });
 
           const idEliminar = await input("\nIngrese el ID de la tarea a eliminar: ");
