@@ -12,7 +12,7 @@ let tareas = [
     {
         titulo: "Java",
         descripcion: "Aprender Java desde cero",
-        estado: "cancelada",
+        estado: "en progreso",
         prioridad: 2,
         fechaLimite: "2024-12-31",
         fechaInicio: "2024-06-01",
@@ -51,6 +51,11 @@ let tareas = [
     },
 ];
 
+function limpiarConsola() {
+    console.clear();
+}
+
+
 // Función para mostrar el menú
 function mostrarMenuPrincipal() {
     console.log("¿Qué deseas hacer?\n");
@@ -72,60 +77,73 @@ function mostrarMenuModificar() {
     console.log(`[0] Volver al menú principal`);
 }
 
+function hayTareas(tareas, estado) {
+    return tareas.some((tarea) => tarea.estado === estado);
+}
+
+
 // Función principal (main)
 async function main() {
-    let opcion;
-    console.clear();
+    // Declaración de variables
+    let opMenuPrincipal;
+    let idTareasFiltradas = [], opVerDetalles;
+    let estadoFiltro;
+    let opModificarItemTarea;
+    let nuevoValorItemTarea;
+
+
+    limpiarConsola();
 
     const nombre = await input("¿Cuál es tu nombre? \n\n> ");
 
-    console.clear();
+    limpiarConsola();
 
     console.log(`¡Hola ${nombre}!\n`);
 
     do {
         mostrarMenuPrincipal();
-        opcion = parseInt(await input("\n> "), 10);
+        opMenuPrincipal = parseInt(await input("\n> "), 10);
 
-        switch (opcion) {
+        switch (opMenuPrincipal) {
             case 1:
                 if (tareas.length === 0) {
                     console.log(`Excelente ${nombre}, no tienes tareas pendientes. 🎉`);
                     await input("\nPresiona ENTER para continuar...");
-                    console.clear();
+                    limpiarConsola();
                     break;
                 } else {
-                    console.clear();
+                    limpiarConsola();
 
                     let opFiltro;
 
                     do {
-                        console.clear();
+                        limpiarConsola();
                         console.log("Qué tareas deseas ver? 📋\n");
                         console.log("[1] Todas");
                         console.log("[2] Pendientes");
                         console.log("[3] En progreso");
-                        console.log("[4] Terminadas");
-                        console.log("[5] Canceladas");
-                        console.log("[0] Volver");
+                        console.log("[4] Completadas");
+                        console.log("[5] Canceladas\n");
+                        console.log("[0] Volver al menú principal");
 
+                        // Pedir al usuario que elija una opción
                         opFiltro = parseInt(await input("\n> "), 10);
 
+                        // Validar la entrada del usuario sea un número entre 0 y 5
                         if (isNaN(opFiltro) || opFiltro < 0 || opFiltro > 5) {
-                            console.clear();
+                            limpiarConsola();
                             console.log("Opción inválida. Por favor, ingrese una opción del menú.");
                             await input("\nPresiona ENTER para continuar...");
                         }
 
+                        // Salir si el usuario elige 0
                         if (opFiltro === 0) {
-                            console.clear();
+                            limpiarConsola();
                             break;
                         }
-
                     } while (isNaN(opFiltro) || opFiltro < 0 || opFiltro > 5);
 
-                    let estadoFiltro;
-
+                    // Guardar el estado seleccionado para filtrar
                     if (opFiltro === 1) {
                         estadoFiltro = "todas";
                     } else if (opFiltro === 2) {
@@ -136,50 +154,60 @@ async function main() {
                         estadoFiltro = "completada";
                     } else if (opFiltro === 5) {
                         estadoFiltro = "cancelada";
+                    } else if (opFiltro === 0) {
+                        break; // Volver al menú principal
                     } else {
-                        console.clear();
+                        limpiarConsola();
                         console.log("Opción inválida. Por favor, ingrese una opción del menú.");
                         await input("\nPresiona ENTER para continuar...");
-                        console.clear();
+                        limpiarConsola();
                         break;
                     }
 
-                    console.clear();
+                    limpiarConsola();
 
-                    let idTareasFiltradas = [];
-
-                    let opVerDetalles;
-
+                    // Mostrar las tareas filtradas
+                    let mostrarDetalles = false; // <-- Agrega esta variable de control
                     do {
+                        idTareasFiltradas = []; // <-- Vacía el array antes de cada filtrado
+
+                        // Muestra al usuario las tareas según el filtro seleccionado
                         if (estadoFiltro === "todas") {
                             console.log(`${nombre}, todas tus tareas son las siguientes: 👀\n`);
-                        } else {
-                            console.log(`${nombre}, tus tareas ${estadoFiltro} son las siguientes: 👀\n`);
-                        }
-
-                        if (estadoFiltro === "todas") {
                             tareas.forEach((tarea, index) => {
                                 console.log(`[${index}] - ${tarea.titulo}`);
                                 idTareasFiltradas.push(index);
                             });
+                            mostrarDetalles = true;
                         } else {
-                            // Filtrar tareas según el estado seleccionado
-                            tareas.forEach((tarea, index) => {
-                                if (estadoFiltro === tarea.estado) {
-                                    console.log(`[${index}] - ${tarea.titulo}`);
-                                    idTareasFiltradas.push(index);
-                                }
-                            });
+                            if (!hayTareas(tareas, estadoFiltro)) {
+                                console.log(`No hay tareas con estado "${estadoFiltro}".`);
+                                await input("\nPresiona ENTER para continuar...");
+                                limpiarConsola();
+                                mostrarDetalles = false;
+                                break; // Sale del bucle y NO pregunta por modificar
+                            } else {
+                                console.log(`${nombre}, tus tareas ${estadoFiltro} son las siguientes: 👀\n`);
+                                tareas.forEach((tarea, index) => {
+                                    if (estadoFiltro === tarea.estado) {
+                                        console.log(`[${index}] - ${tarea.titulo}`);
+                                        idTareasFiltradas.push(index);
+                                    }
+                                });
+                                mostrarDetalles = true;
+                            }
                         }
 
+                        // Pedir al usuario que ingrese el ID de la tarea para ver más detalles
                         opVerDetalles = await input(
                             `\nIngrese el ID para ver más detalles.\n\n> `
                         );
 
+                        // Validar que el ID ingresado sea válido
                         if (idTareasFiltradas.includes(parseInt(opVerDetalles, 10))) {
                             tareas.forEach((tarea, index) => {
                                 if (index == opVerDetalles) {
-                                    console.clear();
+                                    limpiarConsola();
                                     console.log(`Detalles de la tarea:\n`);
                                     console.log(`Título: ${tarea.titulo}`);
                                     console.log(`Descripción: ${tarea.descripcion}`);
@@ -192,116 +220,139 @@ async function main() {
                         } else {
                             console.log("\nID de tarea inválido.");
                             await input("\nPresiona ENTER para continuar...");
-                            console.clear();
+                            limpiarConsola();
                         }
                     } while (!idTareasFiltradas.includes(parseInt(opVerDetalles, 10)));
 
-                    console.log(`\n¿Deseas modificar algun ítem de la tarea?`);
-                    console.log(`[1] Sí`);
-                    console.log(`[2] No`);
+                    // Solo pregunta si mostrarDetalles es true
+                    if (mostrarDetalles) {
+                        // Pregunta al usuario si desea modificar algún campo
+                        console.log(`\n¿Deseas modificar algun ítem de la tarea?\n`);
+                        console.log(`[1] Sí`);
+                        console.log(`[2] No`);
 
-                    let opModificar = parseInt(await input("\n> "), 10);
+                        // Leer la opción del usuario
+                        let opModificar = parseInt(await input("\n> "), 10);
 
-                    if (opModificar === 1) {
-                        console.clear();
-                        mostrarMenuModificar();
-                        let campoModificar = parseInt(await input("\n> "), 10);
-                        let nuevoValor;
-                        switch (campoModificar) {
-                            case 1:
-                                nuevoValor = await input(`Nuevo Título:\n\n> `);
-                                tareas[opVerDetalles].titulo = nuevoValor;
-                                console.log("\nTítulo actualizado con éxito.");
-                                await input("\nPresiona ENTER para continuar...");
-                                console.clear();
-                                break;
-                            case 2:
-                                nuevoValor = await input(`Nueva Descripción:\n\n> `);
-                                tareas[opVerDetalles].descripcion = nuevoValor;
-                                console.log("\nDescripción actualizada con éxito.");
-                                await input("\nPresiona ENTER para continuar...");
-                                console.clear();
-                                break;
-                            case 3:
-                                nuevoValor = await input(
-                                    `Nuevo Estado (pendiente, en progreso, completada, cancelada):\n\n> `
-                                );
-                                if (
-                                    [
-                                        "pendiente",
-                                        "en progreso",
-                                        "completada",
-                                        "cancelada",
-                                    ].includes(nuevoValor.trim())
-                                ) {
-                                    tareas[opVerDetalles].estado = nuevoValor;
-                                    console.log("\nEstado actualizado con éxito.");
+                        // Validar la entrada del usuario
+                        if (opModificar === 1) {
+                            limpiarConsola();
+                            mostrarMenuModificar();
+
+                            // Leer la opción del usuario
+                            opModificarItemTarea = parseInt(await input("\n> "), 10);
+
+                            switch (opModificarItemTarea) {
+                                // Modificar título
+                                case 1:
+                                    nuevoValorItemTarea = await input(`Nuevo Título:\n\n> `);
+                                    tareas[opVerDetalles].titulo = nuevoValorItemTarea;
+                                    console.log("\nTítulo actualizado con éxito.");
                                     await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                } else {
-                                    console.log("\nEstado inválido. No se realizaron cambios.");
+                                    limpiarConsola();
+                                    break;
+
+                                // Modificar descripción
+                                case 2:
+                                    nuevoValorItemTarea = await input(`Nueva Descripción:\n\n> `);
+                                    tareas[opVerDetalles].descripcion = nuevoValorItemTarea;
+                                    console.log("\nDescripción actualizada con éxito.");
                                     await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                }
-                                break;
-                            case 4:
-                                nuevoValor = await input(`Nueva Prioridad (1-3):\n\n> `);
-                                if (["1", "2", "3"].includes(nuevoValor.trim())) {
-                                    tareas[opVerDetalles].prioridad = parseInt(nuevoValor, 10);
-                                    console.log("\nPrioridad actualizada con éxito.");
-                                    await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                } else {
-                                    console.log(
-                                        "\nPrioridad inválida. No se realizaron cambios."
+                                    limpiarConsola();
+                                    break;
+
+                                // Modificar estado
+                                case 3:
+                                    nuevoValorItemTarea = await input(
+                                        `\nPor favor, ingrese el nuevo estado (pendiente, en progreso, completada, cancelada):\n\n> `
                                     );
-                                    await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                }
-                                break;
-                            case 5:
-                                nuevoValor = await input(
-                                    `Nueva Fecha Límite (YYYY-MM-DD):\n\n> `
-                                );
-                                if (!isNaN(Date.parse(nuevoValor))) {
-                                    tareas[opVerDetalles].fechaLimite = nuevoValor;
-                                    console.log("\nFecha Límite actualizada con éxito.");
-                                    await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                } else {
-                                    console.log("\nFecha inválida. No se realizaron cambios.");
-                                    await input("\nPresiona ENTER para continuar...");
-                                    console.clear();
-                                }
-                                break;
-                            case 0:
-                                console.log("\nVolviendo al menú principal...");
-                                break;
-                            default:
-                                console.log("\nOpción inválida. No se realizaron cambios.");
-                                break;
+                                    if (
+                                        [
+                                            "pendiente",
+                                            "en progreso",
+                                            "completada",
+                                            "cancelada",
+                                        ].includes(nuevoValorItemTarea.trim())
+                                    ) {
+                                        tareas[opVerDetalles].estado = nuevoValorItemTarea;
+                                        console.log("\nEstado actualizado con éxito.");
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    } else {
+                                        console.log("\nEstado inválido. No se realizaron cambios.");
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    }
+                                    break;
+
+                                // Modificar prioridad
+                                case 4:
+                                    nuevoValorItemTarea = await input(`Nueva Prioridad (1-3):\n\n> `);
+                                    if (["1", "2", "3"].includes(nuevoValorItemTarea.trim())) {
+                                        tareas[opVerDetalles].prioridad = parseInt(nuevoValorItemTarea, 10);
+                                        console.log("\nPrioridad actualizada con éxito.");
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    } else {
+                                        console.log(
+                                            "\nPrioridad inválida. No se realizaron cambios."
+                                        );
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    }
+                                    break;
+
+                                // Modificar fecha límite
+                                // Falta terminar
+                                case 5:
+                                    nuevoValorItemTarea = await input(
+                                        `Nueva Fecha Límite (YYYY-MM-DD):\n\n> `
+                                    );
+                                    if (!isNaN(Date.parse(nuevoValorItemTarea))) {
+                                        tareas[opVerDetalles].fechaLimite = nuevoValorItemTarea;
+                                        console.log("\nFecha Límite actualizada con éxito.");
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    } else {
+                                        console.log("\nFecha inválida. No se realizaron cambios.");
+                                        await input("\nPresiona ENTER para continuar...");
+                                        limpiarConsola();
+                                    }
+                                    break;
+
+                                // Volver al menú principal
+                                case 0:
+                                    console.log("\nVolviendo al menú principal...");
+                                    break;
+
+                                // Opción inválida
+                                default:
+                                    console.log("\nOpción inválida. No se realizaron cambios.");
+                                    break;
+                            }
+                        } else if (opModificar === 2) {
+                            // El usuario no desea modificar nada. Volver al menú principal.
+                            limpiarConsola();
+                            break;
+                        } else {
+                            // Opción inválida
+                            console.log("\nOpción inválida. Volviendo al menú principal...");
+                            await input("\nPresiona ENTER para continuar...");
+                            limpiarConsola();
                         }
-                    } else if (opModificar === 2) {
-                        console.clear();
-                        break;
-                    } else {
-                        console.log("Opción inválida. Volviendo al menú principal...");
-                        await input("\nPresiona ENTER para continuar...");
-                        console.clear();
                     }
                 }
-
                 break;
 
             case 2:
-                console.clear();
+                limpiarConsola();
 
                 if (tareas.length === 0) {
                     console.log(
                         "Tu lista de tareas está vacía. No hay nada que buscar. 🔍"
                     );
                     await input("\nPresiona ENTER para continuar...");
-                    console.clear();
+                    limpiarConsola();
                     break;
                 }
 
@@ -326,11 +377,11 @@ async function main() {
                 }
 
                 await input("\nPresiona ENTER para continuar...");
-                console.clear();
+                limpiarConsola();
                 break;
 
             case 3:
-                console.clear();
+                limpiarConsola();
                 console.log("Agregar una Tarea ➕\n");
 
                 let titulo, descripcion, estado, prioridad, fechaLimite;
@@ -344,11 +395,11 @@ async function main() {
                         console.log("\nEl título de la tarea no puede estar vacío.");
 
                         await input("\nPresiona ENTER para intentar de nuevo...");
-                        console.clear();
+                        limpiarConsola();
                     }
                 } while (titulo.trim() === "");
 
-                console.clear();
+                limpiarConsola();
 
                 do {
                     descripcion = await input(
@@ -359,11 +410,11 @@ async function main() {
                         console.log("\nLa descripción de la tarea no puede estar vacía.");
 
                         await input("\nPresiona ENTER para intentar de nuevo...");
-                        console.clear();
+                        limpiarConsola();
                     }
                 } while (descripcion.trim() === "");
 
-                console.clear();
+                limpiarConsola();
 
                 do {
                     estado = await input(
@@ -381,7 +432,7 @@ async function main() {
                             "\nEstado inválido. Por favor, ingrese un estado válido."
                         );
                         await input("\nPresiona ENTER para intentar de nuevo...");
-                        console.clear();
+                        limpiarConsola();
                     }
                 } while (
                     estado.trim() === "" ||
@@ -390,7 +441,7 @@ async function main() {
                     )
                 );
 
-                console.clear();
+                limpiarConsola();
 
                 do {
                     prioridad = await input(
@@ -398,21 +449,21 @@ async function main() {
                     );
 
                     if (["1", "2", "3"].includes(prioridad.trim())) {
-                        console.clear();
+                        limpiarConsola();
                         break;
                     } else {
                         console.log(
                             "\nPrioridad inválida. Por favor, ingrese una prioridad válida (1, 2 o 3)."
                         );
                         await input("\nPresiona ENTER para intentar de nuevo...");
-                        console.clear();
+                        limpiarConsola();
                     }
                 } while (
                     prioridad.trim() === "" ||
                     !["1", "2", "3"].includes(prioridad.trim())
                 );
 
-                console.clear();
+                limpiarConsola();
 
                 const fechaInicio = new Date().toISOString().split("T")[0]; // Fecha actual en formato YYYY-MM-DD
                 do {
@@ -432,18 +483,18 @@ async function main() {
                 console.log(`\nTarea agregada con éxito.`);
 
                 await input("\nPresiona ENTER para continuar...");
-                console.clear();
+                limpiarConsola();
                 break;
 
             case 4:
-                console.clear();
+                limpiarConsola();
 
                 if (tareas.length === 0) {
                     console.log(
                         "Tu lista de tareas está vacía. No hay nada que eliminar. 🗑️"
                     );
                     await input("\nPresiona ENTER para continuar...");
-                    console.clear();
+                    limpiarConsola();
                     break;
                 } else {
                     let idBorrar;
@@ -467,9 +518,9 @@ async function main() {
                         } else {
                             console.log("\nID de tarea inválido.");
                             await input("\nPresiona ENTER para intentar de nuevo...");
-                            console.clear();
+                            limpiarConsola();
                         }
-                        console.clear();
+                        limpiarConsola();
                     } while (
                         isNaN(idBorrar) ||
                         idBorrar < 0 ||
@@ -477,21 +528,21 @@ async function main() {
                     );
                 }
                 await input("\nPresiona ENTER para continuar...");
-                console.clear();
+                limpiarConsola();
                 break;
 
             case 0:
-                console.clear();
+                limpiarConsola();
                 break;
 
             default:
-                console.clear();
+                limpiarConsola();
                 console.log("Opción inválida. Por favor, ingrese una opción del menú.");
                 await input("\nPresiona ENTER para continuar...");
-                console.clear();
+                limpiarConsola();
                 break;
         }
-    } while (opcion !== 0);
+    } while (opMenuPrincipal !== 0);
 
     close();
 }
