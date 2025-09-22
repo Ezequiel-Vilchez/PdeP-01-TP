@@ -18,14 +18,16 @@ Es un proyecto simple de consola para gestionar tareas, desarrollado en JavaScri
 ## Instalación
 
 Clona este repositorio:
-   ```sh
-   git clone https://github.com/tu-usuario/tu-repo.git
-   cd tu-repo
-   ```
+
+```sh
+git clone https://github.com/tu-usuario/tu-repo.git
+cd tu-repo
+```
 
 ## Uso
 
 Ejecuta el programa desde la terminal:
+
 ```sh
 node todolist.js
 ```
@@ -41,7 +43,7 @@ Sigue las instrucciones en pantalla para gestionar tus tareas.
 
 - [Mauro Agustín Lucero](https://maurolucero.com.ar)
 - [Ezequiel Vilchez](https://github.com/Ezequiel-Vilchez)
-- Esteban Torres
+- [Esteban Torres](https://github.com/estebandtorres)
 
 ---
 
