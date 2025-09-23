@@ -20,8 +20,8 @@ Es un proyecto simple de consola para gestionar tareas, desarrollado en JavaScri
 Clona este repositorio:
 
 ```sh
-git clone https://github.com/tu-usuario/tu-repo.git
-cd tu-repo
+git clone https://github.com/MauroAg22/PdeP-01-TP.git
+cd PdeP-01-TP
 ```
 
 ## Uso
@@ -29,6 +29,9 @@ cd tu-repo
 Ejecuta el programa desde la terminal:
 
 ```sh
+# calculadora
+node calculator.js
+# Lista de tareas
 node todolist.js
 ```
 
@@ -44,6 +47,12 @@ Sigue las instrucciones en pantalla para gestionar tus tareas.
 - [Mauro Agustín Lucero](https://maurolucero.com.ar)
 - [Ezequiel Vilchez](https://github.com/Ezequiel-Vilchez)
 - [Esteban Torres](https://github.com/estebandtorres)
+
+## Profesores de la carrera
+
+- [Walter Molina](https://github.com/waltermolina) (Profesor Adjunto. Responsable)
+- [Rodrigo Silva]() (Jefe de Trabajos Prácticos)
+- [Matías Endres]() (Profesor Adjunto)
 
 ---
 
