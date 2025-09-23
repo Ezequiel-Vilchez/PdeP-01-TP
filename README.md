@@ -51,7 +51,7 @@ Sigue las instrucciones en pantalla para gestionar tus tareas.
 ## Profesores de la carrera
 
 - [Walter Molina](https://github.com/waltermolina) (Profesor Adjunto. Responsable)
-- [Rodrigo Silva]() (Jefe de Trabajos Prácticos)
+- [Rodrigo Silva](https://github.com/Rns2590) (Jefe de Trabajos Prácticos)
 - [Matías Endres]() (Profesor Adjunto)
 
 ---
