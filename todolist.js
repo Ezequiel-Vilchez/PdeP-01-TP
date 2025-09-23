@@ -3,94 +3,92 @@
 // =======================
 
 const { input, close } = require("./lib/nodeImperativo");
+const { menuPrincipal, menuModificar, menuTareasAVer } = require("./lib/interfaz");
+// const { setEntrada } = require('./lib/funciones');
+
 
 // Lista de tareas en memoria
 
 // [titulo principal, descipcion, 'terminado, en curso, pendiente y canceladas', 'facil, medio y dificil', vencimiento, creacion]
 
+const arrayEstados = [
+    "pendiente",
+    "en progreso",
+    "completada",
+    "cancelada"
+];
+const arrayPrioridad = [
+    "++----",
+    "++++--",
+    "++++++"
+];
+
 let tareas = [
     {
-        titulo: "Java",
-        descripcion: "Aprender Java desde cero",
-        estado: "en progreso",
-        prioridad: 2,
-        fechaLimite: "2024-12-31",
-        fechaInicio: "2024-06-01",
+        titulo: "Lavar la ropa",
+        descripcion: "Separar por colores y usar jabón líquido",
+        estado: arrayEstados[0],
+        prioridad: arrayPrioridad[1],
+        fechaLimite: "2025-09-24",
+        fechaInicio: "2025-09-23",
     },
     {
-        titulo: "JavaScript",
-        descripcion: "Dominar JavaScript y sus frameworks",
-        estado: "en progreso",
-        prioridad: 3,
-        fechaLimite: "2024-11-30",
-        fechaInicio: "2024-06-05",
+        titulo: "Comprar repuesto de la moto",
+        descripcion: "Buscar bujía y filtro de aire en la ferretería de la esquina",
+        estado: arrayEstados[1],
+        prioridad: arrayPrioridad[2],
+        fechaLimite: "2025-09-25",
+        fechaInicio: "2025-09-22",
     },
     {
-        titulo: "Python",
-        descripcion: "Aprender Python para análisis de datos",
-        estado: "completada",
-        prioridad: 1,
-        fechaLimite: "2024-10-15",
-        fechaInicio: "2024-05-20",
+        titulo: "Pintar la casa",
+        descripcion: "Empezar por el living, usar pintura lavable",
+        estado: arrayEstados[0],
+        prioridad: arrayPrioridad[2],
+        fechaLimite: "2025-10-10",
+        fechaInicio: "2025-09-28",
     },
     {
-        titulo: "HTML",
-        descripcion: "Aprender HTML y CSS",
-        estado: "pendiente",
-        prioridad: 2,
-        fechaLimite: "2024-12-31",
-        fechaInicio: "2024-06-01",
+        titulo: "Hacer compras del súper",
+        descripcion: "Leche, pan, yerba, fideos, y algo dulce",
+        estado: arrayEstados[2],
+        prioridad: arrayPrioridad[0],
+        fechaLimite: "2025-09-22",
+        fechaInicio: "2025-09-22",
     },
     {
-        titulo: "C++",
-        descripcion: "Aprender C++ para desarrollo de sistemas",
-        estado: "pendiente",
-        prioridad: 3,
-        fechaLimite: "2025-01-15",
-        fechaInicio: "2024-06-10",
+        titulo: "Llevar al perro al veterinario",
+        descripcion: "Control de vacunas y revisión general",
+        estado: arrayEstados[0],
+        prioridad: arrayPrioridad[1],
+        fechaLimite: "2025-09-30",
+        fechaInicio: "2025-09-23",
     },
 ];
 
-function limpiarConsola() {
+
+const limpiarConsola = () => {
     console.clear();
 }
 
-
-// Función para mostrar el menú
-function mostrarMenuPrincipal() {
-    console.log("¿Qué deseas hacer?\n");
-    console.log("[1] Ver Mis Tareas.");
-    console.log("[2] Buscar una Tarea.");
-    console.log("[3] Agregar una Tarea.");
-    console.log("[4] Eliminar una Tarea.\n");
-    console.log("[0] Salir.");
-}
-
-// Función para mostrar el menú de modificación
-function mostrarMenuModificar() {
-    console.log(`¿Qué deseas modificar?\n`);
-    console.log(`[1] Título`);
-    console.log(`[2] Descripción`);
-    console.log(`[3] Estado`);
-    console.log(`[4] Prioridad`);
-    console.log(`[5] Fecha Límite\n`);
-    console.log(`[0] Volver al menú principal`);
-}
-
-function hayTareas(tareas, estado) {
+const hayTareas = (tareas, estado) => {
     return tareas.some((tarea) => tarea.estado === estado);
 }
 
 
+// function hayTareas(tareas, estado) {
+//     return tareas.some((tarea) => tarea.estado === estado);
+// }
+
+// Declaración de variables
+let opMenuPrincipal;
+let idTareasFiltradas = [], opVerDetalles;
+let estadoFiltro;
+let opModificarItemTarea;
+let nuevoValorItemTarea;
+
 // Función principal (main)
 async function main() {
-    // Declaración de variables
-    let opMenuPrincipal;
-    let idTareasFiltradas = [], opVerDetalles;
-    let estadoFiltro;
-    let opModificarItemTarea;
-    let nuevoValorItemTarea;
-
 
     limpiarConsola();
 
@@ -101,12 +99,15 @@ async function main() {
     console.log(`¡Hola ${nombre}!\n`);
 
     do {
-        mostrarMenuPrincipal();
+        menuPrincipal();
         opMenuPrincipal = parseInt(await input("\n> "), 10);
 
         switch (opMenuPrincipal) {
+
+            // [1] Ver Mis Tareas.
             case 1:
                 if (tareas.length === 0) {
+                    limpiarConsola();
                     console.log(`Excelente ${nombre}, no tienes tareas pendientes. 🎉`);
                     await input("\nPresiona ENTER para continuar...");
                     limpiarConsola();
@@ -118,21 +119,15 @@ async function main() {
 
                     do {
                         limpiarConsola();
-                        console.log("Qué tareas deseas ver? 📋\n");
-                        console.log("[1] Todas");
-                        console.log("[2] Pendientes");
-                        console.log("[3] En progreso");
-                        console.log("[4] Completadas");
-                        console.log("[5] Canceladas\n");
-                        console.log("[0] Volver al menú principal");
 
+                        menuTareasAVer();
                         // Pedir al usuario que elija una opción
                         opFiltro = parseInt(await input("\n> "), 10);
 
                         // Validar la entrada del usuario sea un número entre 0 y 5
                         if (isNaN(opFiltro) || opFiltro < 0 || opFiltro > 5) {
                             limpiarConsola();
-                            console.log("Opción inválida. Por favor, ingrese una opción del menú.");
+                            console.log("\nOpción inválida. Por favor, ingrese una opción del menú.");
                             await input("\nPresiona ENTER para continuar...");
                         }
 
@@ -143,17 +138,19 @@ async function main() {
                         }
                     } while (isNaN(opFiltro) || opFiltro < 0 || opFiltro > 5);
 
+
+
                     // Guardar el estado seleccionado para filtrar
                     if (opFiltro === 1) {
                         estadoFiltro = "todas";
                     } else if (opFiltro === 2) {
-                        estadoFiltro = "pendiente";
+                        estadoFiltro = arrayEstados[0];
                     } else if (opFiltro === 3) {
-                        estadoFiltro = "en progreso";
+                        estadoFiltro = arrayEstados[1];
                     } else if (opFiltro === 4) {
-                        estadoFiltro = "completada";
+                        estadoFiltro = arrayEstados[2];
                     } else if (opFiltro === 5) {
-                        estadoFiltro = "cancelada";
+                        estadoFiltro = arrayEstados[3];
                     } else if (opFiltro === 0) {
                         break; // Volver al menú principal
                     } else {
@@ -237,7 +234,7 @@ async function main() {
                         // Validar la entrada del usuario
                         if (opModificar === 1) {
                             limpiarConsola();
-                            mostrarMenuModificar();
+                            menuModificar();
 
                             // Leer la opción del usuario
                             opModificarItemTarea = parseInt(await input("\n> "), 10);
@@ -245,7 +242,7 @@ async function main() {
                             switch (opModificarItemTarea) {
                                 // Modificar título
                                 case 1:
-                                    nuevoValorItemTarea = await input(`Nuevo Título:\n\n> `);
+                                    nuevoValorItemTarea = await input(`\nNuevo Título:\n\n> `);
                                     tareas[opVerDetalles].titulo = nuevoValorItemTarea;
                                     console.log("\nTítulo actualizado con éxito.");
                                     await input("\nPresiona ENTER para continuar...");
@@ -263,43 +260,59 @@ async function main() {
 
                                 // Modificar estado
                                 case 3:
-                                    nuevoValorItemTarea = await input(
-                                        `\nPor favor, ingrese el nuevo estado (pendiente, en progreso, completada, cancelada):\n\n> `
-                                    );
-                                    if (
-                                        [
-                                            "pendiente",
-                                            "en progreso",
-                                            "completada",
-                                            "cancelada",
-                                        ].includes(nuevoValorItemTarea.trim())
-                                    ) {
-                                        tareas[opVerDetalles].estado = nuevoValorItemTarea;
-                                        console.log("\nEstado actualizado con éxito.");
-                                        await input("\nPresiona ENTER para continuar...");
+
+                                    let opEstado;
+
+                                    do {
                                         limpiarConsola();
-                                    } else {
-                                        console.log("\nEstado inválido. No se realizaron cambios.");
-                                        await input("\nPresiona ENTER para continuar...");
-                                        limpiarConsola();
-                                    }
+                                        console.log("Ingrese el nuevo estado:\n");
+                                        console.log(`[0] - ${arrayEstados[0]}`);
+                                        console.log(`[1] - ${arrayEstados[1]}`);
+                                        console.log(`[2] - ${arrayEstados[2]}`);
+                                        console.log(`[3] - ${arrayEstados[3]}`);
+
+                                        opEstado = parseInt(await input(`\n> `));
+
+                                        if (opEstado < 0 || opEstado > 3) {
+                                            console.log("\nOpción inválida. Por favor vuelva a intentar.");
+                                            await input("\nPresiona ENTER para intentar de nuevo...");
+                                            limpiarConsola();
+                                        } else {
+                                            tareas[opVerDetalles].estado = arrayEstados[opEstado];
+                                            console.log("\nEstado actualizado con éxito.");
+                                            await input("\nPresiona ENTER para continuar...");
+                                            limpiarConsola();
+                                        }
+
+                                    } while (opEstado < 0 || opEstado > 3);
                                     break;
 
                                 // Modificar prioridad
                                 case 4:
-                                    nuevoValorItemTarea = await input(`Nueva Prioridad (1-3):\n\n> `);
-                                    if (["1", "2", "3"].includes(nuevoValorItemTarea.trim())) {
-                                        tareas[opVerDetalles].prioridad = parseInt(nuevoValorItemTarea, 10);
-                                        console.log("\nPrioridad actualizada con éxito.");
-                                        await input("\nPresiona ENTER para continuar...");
+
+                                    let opPrioridad;
+
+                                    do {
                                         limpiarConsola();
-                                    } else {
-                                        console.log(
-                                            "\nPrioridad inválida. No se realizaron cambios."
-                                        );
-                                        await input("\nPresiona ENTER para continuar...");
-                                        limpiarConsola();
-                                    }
+                                        console.log("Nueva Prioridad:\n");
+                                        console.log(`[0]  ${arrayPrioridad[0]}`);
+                                        console.log(`[1]  ${arrayPrioridad[1]}`);
+                                        console.log(`[2]  ${arrayPrioridad[2]}`);
+
+                                        opPrioridad = parseInt(await input(`\n> `));
+
+                                        if (opPrioridad >= 0 && opPrioridad <= 3) {
+                                            tareas[opVerDetalles].prioridad = arrayPrioridad[opPrioridad];
+                                            console.log("\nPrioridad actualizada con éxito.");
+                                            await input("\nPresiona ENTER para continuar...");
+                                            limpiarConsola();
+                                        } else {
+                                            console.log("\nPrioridad inválida. No se realizaron cambios.");
+                                            await input("\nPresiona ENTER para continuar...");
+                                            limpiarConsola();
+                                        }
+                                    } while (!(opPrioridad >= 0 && opPrioridad <= 3))
+
                                     break;
 
                                 // Modificar fecha límite
@@ -344,6 +357,7 @@ async function main() {
                 }
                 break;
 
+            // [2] Buscar una Tarea.
             case 2:
                 limpiarConsola();
 
@@ -380,92 +394,85 @@ async function main() {
                 limpiarConsola();
                 break;
 
+            // [3] Agregar una Tarea.
             case 3:
                 limpiarConsola();
                 console.log("Agregar una Tarea ➕\n");
 
+                // Variables locales para agregar tareas.
                 let titulo, descripcion, estado, prioridad, fechaLimite;
+                let opEstado, opPrioridad;
 
+
+                // Agregando título.
                 do {
-                    titulo = await input(
-                        `Por favor ${nombre}, ingrese el título de la nueva tarea\n\n> `
-                    );
+                    titulo = await input(`Por favor ${nombre}, ingrese el título de la nueva tarea\n\n> `);
 
                     if (titulo.trim() === "") {
                         console.log("\nEl título de la tarea no puede estar vacío.");
-
                         await input("\nPresiona ENTER para intentar de nuevo...");
                         limpiarConsola();
                     }
                 } while (titulo.trim() === "");
-
                 limpiarConsola();
 
+                // Agregando descrición.
                 do {
-                    descripcion = await input(
-                        `Por favor ${nombre}, ingrese la descripción de la nueva tarea\n\n> `
-                    );
+                    descripcion = await input(`Por favor ${nombre}, ingrese la descripción de la nueva tarea\n\n> `);
 
                     if (descripcion.trim() === "") {
                         console.log("\nLa descripción de la tarea no puede estar vacía.");
-
                         await input("\nPresiona ENTER para intentar de nuevo...");
                         limpiarConsola();
                     }
                 } while (descripcion.trim() === "");
-
                 limpiarConsola();
 
+                // Agregando estado.
                 do {
-                    estado = await input(
-                        `Por favor ${nombre}, ingrese el estado de la nueva tarea (pendiente, en progreso, completada, cancelada)\n\n> `
-                    );
+                    console.log("Ingrese el estado:\n");
+                    console.log(`[0] - ${arrayEstados[0]}`);
+                    console.log(`[1] - ${arrayEstados[1]}`);
+                    console.log(`[2] - ${arrayEstados[2]}`);
+                    console.log(`[3] - ${arrayEstados[3]}`);
 
-                    if (
-                        ["pendiente", "en progreso", "completada", "cancelada"].includes(
-                            estado.trim()
-                        )
-                    ) {
-                        break;
-                    } else {
-                        console.log(
-                            "\nEstado inválido. Por favor, ingrese un estado válido."
-                        );
+                    opEstado = parseInt(await input(`\n> `));
+
+                    if (opEstado < 0 || opEstado > 3) {
+                        console.log("\nOpción inválida. Por favor vuelva a intentar.");
                         await input("\nPresiona ENTER para intentar de nuevo...");
                         limpiarConsola();
-                    }
-                } while (
-                    estado.trim() === "" ||
-                    !["pendiente", "en progreso", "completada", "cancelada"].includes(
-                        estado.trim()
-                    )
-                );
-
-                limpiarConsola();
-
-                do {
-                    prioridad = await input(
-                        `Por favor ${nombre}, ingrese la prioridad de la nueva tarea (1-3)\n\n> `
-                    );
-
-                    if (["1", "2", "3"].includes(prioridad.trim())) {
-                        limpiarConsola();
-                        break;
                     } else {
-                        console.log(
-                            "\nPrioridad inválida. Por favor, ingrese una prioridad válida (1, 2 o 3)."
-                        );
-                        await input("\nPresiona ENTER para intentar de nuevo...");
+                        estado = arrayEstados[opEstado];
                         limpiarConsola();
                     }
-                } while (
-                    prioridad.trim() === "" ||
-                    !["1", "2", "3"].includes(prioridad.trim())
-                );
 
+                } while (opEstado < 0 || opEstado > 3);
                 limpiarConsola();
 
+                // Agregando prioridad.
+                do {
+                    console.log("Nueva Prioridad:\n");
+                    console.log(`[0]  ${arrayPrioridad[0]}`);
+                    console.log(`[1]  ${arrayPrioridad[1]}`);
+                    console.log(`[2]  ${arrayPrioridad[2]}`);
+
+                    opPrioridad = parseInt(await input(`\n> `));
+
+                    if (opPrioridad >= 0 && opPrioridad <= 3) {
+                        prioridad = arrayPrioridad[opPrioridad];
+                        limpiarConsola();
+                    } else {
+                        console.log("\nPrioridad inválida. No se realizaron cambios.");
+                        await input("\nPresiona ENTER para continuar...");
+                        limpiarConsola();
+                    }
+                } while (!(opPrioridad >= 0 && opPrioridad <= 3))
+
+                // Agregando fecha inicio.
                 const fechaInicio = new Date().toISOString().split("T")[0]; // Fecha actual en formato YYYY-MM-DD
+
+                // Agregando fecha fin.
                 do {
                     fechaLimite = await input(
                         `Por favor ${nombre}, ingrese la fecha límite de la nueva tarea (YYYY-MM-DD)\n\n> `
@@ -476,7 +483,7 @@ async function main() {
                     titulo,
                     descripcion,
                     estado,
-                    prioridad: parseInt(prioridad, 10),
+                    prioridad,
                     fechaLimite,
                     fechaInicio,
                 });
@@ -486,6 +493,7 @@ async function main() {
                 limpiarConsola();
                 break;
 
+            // [4] Eliminar una Tarea.
             case 4:
                 limpiarConsola();
 
@@ -531,10 +539,12 @@ async function main() {
                 limpiarConsola();
                 break;
 
+            // [0] Salir.
             case 0:
                 limpiarConsola();
                 break;
 
+            // Opción inválida.
             default:
                 limpiarConsola();
                 console.log("Opción inválida. Por favor, ingrese una opción del menú.");
